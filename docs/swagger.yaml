@@ -1,0 +1,22 @@
+info:
+  contact: {}
+paths:
+  /index:
+    get:
+      responses:
+        "200":
+          description: Welcome!
+          schema:
+            type: string
+      tags:
+      - Index
+  /user:
+    get:
+      responses:
+        "200":
+          description: username, password
+          schema:
+            type: string
+      tags:
+      - UserList
+swagger: "2.0"

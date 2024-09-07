@@ -1,0 +1,2 @@
+mysql:
+  dsn: root:password@tcp(localhost:3306)/gim_db?charset=utf8mb4&parseTime=True&loc=Local
