@@ -1,17 +1,17 @@
 package main
 
 import (
-  "gorm.io/gorm"
-  "gorm.io/driver/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 type Product struct {
 	gorm.Model
 	Code  string
 	Price uint
-  }
+}
 
-func main() {
+func testGorm() {
 	dsn := "root:password@tcp(localhost:3306)/gorm_test?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -26,7 +26,7 @@ func main() {
 
 	// Read
 	var product Product
-	db.First(&product, 1) // 根据整型主键查找
+	db.First(&product, 1)                 // 根据整型主键查找
 	db.First(&product, "code = ?", "D42") // 查找 code 字段值为 D42 的记录
 
 	// Update - 将 product 的 price 更新为 200
