@@ -2,7 +2,6 @@ package main
 
 import (
 	"Gim/internal/router"
-	"Gim/internal/service"
 	"Gim/internal/sql"
 	// "Gim/utils"
 )
