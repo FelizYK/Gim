@@ -88,10 +88,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Delete user success!",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "description": "Delete user success!"
                     }
                 }
             }
@@ -131,10 +128,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Update user success!",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "description": "Update user success!"
                     }
                 }
             }

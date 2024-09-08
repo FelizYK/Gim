@@ -51,9 +51,7 @@ func CreateUser(c *gin.Context) {
 // @Router       /user/getUserList [get]
 func GetUserList(c *gin.Context) {
 	users := logic.GetUserList()
-	for _, user := range users {
-		c.JSON(http.StatusOK, gin.H{"username": user.Username, "password": user.Password})
-	}
+	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
 // UpdateUser godoc
