@@ -30,18 +30,128 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
-            "get": {
+        "/user/createUser": {
+            "post": {
                 "tags": [
-                    "UserList"
+                    "User"
+                ],
+                "summary": "CreateUser",
+                "parameters": [
+                    {
+                        "description": "username, password, repassword",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.userInfo"
+                        }
+                    }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "username, password",
+                    "201": {
+                        "description": "Create user success!",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Passwords do not match",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "/user/deleteUser": {
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "DeleteUser",
+                "parameters": [
+                    {
+                        "description": "username, password, any",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.userInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Delete user success!",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/getUserList": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "GetUserList",
+                "responses": {
+                    "200": {
+                        "description": "Get user list",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/updateUser": {
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "UpdateUser",
+                "parameters": [
+                    {
+                        "description": "username, old password, new password",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.userInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Update user success!",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "service.userInfo": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "repassword": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

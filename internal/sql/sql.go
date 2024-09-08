@@ -29,5 +29,6 @@ func InitMySQL() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("MySQL connected")
 }

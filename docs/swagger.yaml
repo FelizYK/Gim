@@ -1,3 +1,13 @@
+definitions:
+  service.userInfo:
+    properties:
+      password:
+        type: string
+      repassword:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -10,13 +20,73 @@ paths:
             type: string
       tags:
       - Index
-  /user:
+  /user/createUser:
+    post:
+      parameters:
+      - description: username, password, repassword
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.userInfo'
+      responses:
+        "201":
+          description: Create user success!
+          schema:
+            type: string
+        "400":
+          description: Passwords do not match
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: CreateUser
+      tags:
+      - User
+  /user/deleteUser:
+    delete:
+      parameters:
+      - description: username, password, any
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.userInfo'
+      responses:
+        "204":
+          description: Delete user success!
+          schema:
+            type: string
+      summary: DeleteUser
+      tags:
+      - User
+  /user/getUserList:
     get:
       responses:
         "200":
-          description: username, password
+          description: Get user list
           schema:
             type: string
+      summary: GetUserList
       tags:
-      - UserList
+      - User
+  /user/updateUser:
+    put:
+      parameters:
+      - description: username, old password, new password
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/service.userInfo'
+      responses:
+        "204":
+          description: Update user success!
+          schema:
+            type: string
+      summary: UpdateUser
+      tags:
+      - User
 swagger: "2.0"
