@@ -10,6 +10,7 @@ type UserInfo struct {
 	gorm.Model
 	Username  string
 	Password  string
+	Salt      string
 	Telephone string
 	Email     string
 }
@@ -28,9 +29,19 @@ func CreateUser(user UserInfo) error {
 	return sql.DB.Create(&user).Error
 }
 
-func GetUser(username, password string) (UserInfo, error) {
+func GetUserByName(username string) (UserInfo, error) {
 	var user UserInfo
-	err := sql.DB.Where("username = ? AND password = ?", username, password).First(&user).Error
+	err := sql.DB.Where("username = ?", username).First(&user).Error
+	return user, err
+}
+func GetUserByTelephone(telephone string) (UserInfo, error) {
+	var user UserInfo
+	err := sql.DB.Where("telephone = ?", telephone).First(&user).Error
+	return user, err
+}
+func GetUserByEmail(email string) (UserInfo, error) {
+	var user UserInfo
+	err := sql.DB.Where("email = ?", email).First(&user).Error
 	return user, err
 }
 

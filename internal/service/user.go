@@ -2,6 +2,10 @@ package service
 
 import (
 	"Gim/internal/logic"
+	"Gim/internal/utils"
+	"crypto/rand"
+	"fmt"
+	"math/big"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -20,7 +24,9 @@ type createUserInfo struct {
 //	@Param		user	body		createUserInfo	true	"username, password, repassword"
 //	@Success	201		{string}	string			"Create user success!"
 //	@Failure	400		{string}	string			"Invalid input"
+//	@Failure	400		{string}	string			"Username already exists"
 //	@Failure	400		{string}	string			"Passwords not same"
+//  @Failure	500		{string}	string			"Random salt generation failed"
 //	@Failure	500		{string}	string			"Internal server error"
 //	@Router		/user/createUser [post]
 func CreateUser(c *gin.Context) {
@@ -29,15 +35,27 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
+	// check if the username exists
+	user, err := logic.GetUserByName(newUser.Username)
+	if err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Username already exists"})
+		return
+	}
 	// check if the password and repassword are the same
 	if newUser.Password != newUser.RePassword {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Passwords not same"})
 		return
 	}
-	// create the user
-	var user logic.UserInfo
+	// create
 	user.Username = newUser.Username
-	user.Password = newUser.Password
+	// user.Password = newUser.Password
+	saltInt, err := rand.Int(rand.Reader, big.NewInt(1000000))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "Random salt generation failed"})
+		return
+	}
+	user.Salt = fmt.Sprintf("%x", saltInt)
+	user.Password = utils.MakePassword(newUser.Password, user.Salt)
 	if err := logic.CreateUser(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "Internal server error"})
 		return
@@ -80,8 +98,8 @@ func UpdateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
-	user, err := logic.GetUser(newUser.Username, newUser.Password)
-	if err != nil {
+	user, err := logic.GetUserByName(newUser.Username)
+	if err != nil || user.Password != newUser.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "Invalid username or password"})
 		return
 	}
@@ -125,13 +143,13 @@ type deleteUserInfo struct {
 //	@Router		/user/deleteUser [delete]
 func DeleteUser(c *gin.Context) {
 	// check if the user exists and the password is correct
-	var loginUser deleteUserInfo
-	if err := c.ShouldBindJSON(&loginUser); err != nil {
+	var newUser deleteUserInfo
+	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
-	user, err := logic.GetUser(loginUser.Username, loginUser.Password)
-	if err != nil {
+	user, err := logic.GetUserByName(newUser.Username)
+	if err != nil || user.Password != newUser.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "Invalid username or password"})
 		return
 	}
