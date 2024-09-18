@@ -43,7 +43,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.userInfo"
+                            "$ref": "#/definitions/service.createUserInfo"
                         }
                     }
                 ],
@@ -55,7 +55,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Passwords do not match",
+                        "description": "Passwords not same",
                         "schema": {
                             "type": "string"
                         }
@@ -77,18 +77,36 @@ const docTemplate = `{
                 "summary": "DeleteUser",
                 "parameters": [
                     {
-                        "description": "username, password, any",
+                        "description": "username, password",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.userInfo"
+                            "$ref": "#/definitions/service.deleteUserInfo"
                         }
                     }
                 ],
                 "responses": {
                     "204": {
                         "description": "Delete user success!"
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid username or password",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -117,31 +135,77 @@ const docTemplate = `{
                 "summary": "UpdateUser",
                 "parameters": [
                     {
-                        "description": "username, old password, new password",
+                        "description": "username, password, password/telephone/email, data",
                         "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.userInfo"
+                            "$ref": "#/definitions/service.updateUserInfo"
                         }
                     }
                 ],
                 "responses": {
                     "204": {
                         "description": "Update user success!"
+                    },
+                    "400": {
+                        "description": "Invalid parameter",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid username or password",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "service.userInfo": {
+        "service.createUserInfo": {
             "type": "object",
             "properties": {
                 "password": {
                     "type": "string"
                 },
-                "repassword": {
+                "rePassword": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.deleteUserInfo": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.updateUserInfo": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "parameter": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 },
                 "username": {

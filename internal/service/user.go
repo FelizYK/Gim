@@ -4,33 +4,34 @@ import (
 	"Gim/internal/logic"
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
-type userInfo struct {
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	Repassword string `json:"repassword"`
+type createUserInfo struct {
+	Username   string
+	Password   string
+	RePassword string
 }
 
 // CreateUser godoc
-// @Summary      CreateUser
-// @Tags         User
-// @Param        user body userInfo true "username, password, repassword"
-// @Success      201  {string}  "Create user success!"
-// @Failure      400  {string}  "Invalid input"
-// @Failure      400  {string}  "Passwords do not match"
-// @Failure      500  {string}  "Internal server error"
-// @Router       /user/createUser [post]
+//	@Summary	CreateUser
+//	@Tags		User
+//	@Param		user	body		createUserInfo	true	"username, password, repassword"
+//	@Success	201		{string}	string			"Create user success!"
+//	@Failure	400		{string}	string			"Invalid input"
+//	@Failure	400		{string}	string			"Passwords not same"
+//	@Failure	500		{string}	string			"Internal server error"
+//	@Router		/user/createUser [post]
 func CreateUser(c *gin.Context) {
-	var newUser userInfo
+	var newUser createUserInfo
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
 	// check if the password and repassword are the same
-	if newUser.Password != newUser.Repassword {
-		c.JSON(http.StatusBadRequest, gin.H{"msg": "Passwords do not match"})
+	if newUser.Password != newUser.RePassword {
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Passwords not same"})
 		return
 	}
 	// create the user
@@ -45,35 +46,62 @@ func CreateUser(c *gin.Context) {
 }
 
 // GetUserList godoc
-// @Summary      GetUserList
-// @Tags         User
-// @Success      200  {string}  "Get user list"
-// @Router       /user/getUserList [get]
+//	@Summary	GetUserList
+//	@Tags		User
+//	@Success	200	{string}	string	"Get user list"
+//	@Router		/user/getUserList [get]
 func GetUserList(c *gin.Context) {
 	users := logic.GetUserList()
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
+type updateUserInfo struct {
+	Username  string
+	Password  string
+	Parameter string
+	Data      string
+}
+
 // UpdateUser godoc
-// @Summary      UpdateUser
-// @Tags         User
-// @Param        user body userInfo true "username, old password, new password"
-// @Success      204  "Update user success!"
-// @Router       /user/updateUser [put]
+//	@Summary	UpdateUser
+//	@Tags		User
+//	@Param		user	body	updateUserInfo	true	"username, password, password/telephone/email, data"
+//	@Success	204		"Update user success!"
+//	@Failure	400		{string}	string	"Invalid input"
+//	@Failure	401		{string}	string	"Invalid username or password"
+//	@Failure	400		{string}	string	"Invalid email"
+//	@Failure	400		{string}	string	"Invalid parameter"
+//	@Failure	500		{string}	string	"Internal server error"
+//	@Router		/user/updateUser [put]
 func UpdateUser(c *gin.Context) {
-	var newUser userInfo
+	// check login
+	var newUser updateUserInfo
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
-	// check if the user exists and the password is correct
 	user, err := logic.GetUser(newUser.Username, newUser.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "Invalid username or password"})
 		return
 	}
-	// update the password
-	user.Password = newUser.Repassword
+	// check update
+	switch newUser.Parameter {
+	case "password":
+		user.Password = newUser.Data
+	case "telephone":
+		user.Telephone = newUser.Data
+	case "email":
+		if !govalidator.IsEmail(newUser.Data) {
+			c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid email"})
+			return
+		}
+		user.Email = newUser.Data
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid parameter"})
+		return
+	}
+	// update
 	if err := logic.UpdateUser(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "Internal server error"})
 		return
@@ -81,25 +109,33 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusNoContent, gin.H{"msg": "Update user success!"})
 }
 
+type deleteUserInfo struct {
+	Username string
+	Password string
+}
+
 // DeleteUser godoc
-// @Summary      DeleteUser
-// @Tags         User
-// @Param        user body userInfo true "username, password, any"
-// @Success      204  "Delete user success!"
-// @Router       /user/deleteUser [delete]
+//	@Summary	DeleteUser
+//	@Tags		User
+//	@Param		user	body	deleteUserInfo	true	"username, password"
+//	@Success	204		"Delete user success!"
+//	@Failure	400		{string}	string	"Invalid input"
+//	@Failure	401		{string}	string	"Invalid username or password"
+//	@Failure	500		{string}	string	"Internal server error"
+//	@Router		/user/deleteUser [delete]
 func DeleteUser(c *gin.Context) {
-	var checkUser userInfo
-	if err := c.ShouldBindJSON(&checkUser); err != nil {
+	// check if the user exists and the password is correct
+	var loginUser deleteUserInfo
+	if err := c.ShouldBindJSON(&loginUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"msg": "Invalid input"})
 		return
 	}
-	// check if the user exists and the password is correct
-	user, err := logic.GetUser(checkUser.Username, checkUser.Password)
+	user, err := logic.GetUser(loginUser.Username, loginUser.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "Invalid username or password"})
 		return
 	}
-	// delete the user
+	// delete
 	if err := logic.DeleteUser(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"msg": "Internal server error"})
 		return
