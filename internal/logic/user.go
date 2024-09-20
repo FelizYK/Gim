@@ -1,7 +1,7 @@
 package logic
 
 import (
-	"Gim/internal/sql"
+	"Gim/internal/server"
 
 	"gorm.io/gorm"
 )
@@ -21,41 +21,41 @@ func (table *UserInfo) TableName() string {
 }
 
 func InitUserTable() {
-	sql.DB.AutoMigrate(&UserInfo{})
+	server.DB.AutoMigrate(&UserInfo{})
 }
 
 // ===== CRUD =====
 
 func CreateUser(user UserInfo) error {
-	return sql.DB.Create(&user).Error
+	return server.DB.Create(&user).Error
 }
 
 func GetUserByName(username string) (UserInfo, error) {
 	var user UserInfo
-	err := sql.DB.Where("username = ?", username).First(&user).Error
+	err := server.DB.Where("username = ?", username).First(&user).Error
 	return user, err
 }
 func GetUserByTel(telephone string) (UserInfo, error) {
 	var user UserInfo
-	err := sql.DB.Where("telephone = ?", telephone).First(&user).Error
+	err := server.DB.Where("telephone = ?", telephone).First(&user).Error
 	return user, err
 }
 func GetUserByEmail(email string) (UserInfo, error) {
 	var user UserInfo
-	err := sql.DB.Where("email = ?", email).First(&user).Error
+	err := server.DB.Where("email = ?", email).First(&user).Error
 	return user, err
 }
 
 func GetUserList() ([]*UserInfo, error) {
 	var users []*UserInfo
-	err := sql.DB.Find(&users).Error
+	err := server.DB.Find(&users).Error
 	return users, err
 }
 
 func UpdateUser(user UserInfo) error {
-	return sql.DB.Save(&user).Error
+	return server.DB.Save(&user).Error
 }
 
 func DeleteUser(user UserInfo) error {
-	return sql.DB.Delete(&user).Error
+	return server.DB.Delete(&user).Error
 }
