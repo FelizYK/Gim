@@ -13,6 +13,7 @@ type UserInfo struct {
 	Salt      string
 	Telephone string
 	Email     string
+	Token     string
 }
 
 func (table *UserInfo) TableName() string {

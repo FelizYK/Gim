@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
@@ -92,6 +93,13 @@ func GetUser(c *gin.Context) {
 	user, err := logic.GetUserByName(newUser.Username)
 	if err != nil || !utils.CheckPassword(newUser.Password, user.Salt, user.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"msg": "Invalid username or password"})
+		return
+	}
+	// update token
+	tmp := fmt.Sprintf("%d", time.Now().Unix())
+	user.Token = utils.Md5Encode(tmp)
+	if err := logic.UpdateUser(user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"msg": "Internal server error"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"user": user})
