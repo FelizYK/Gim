@@ -34,7 +34,7 @@ func GetUserByName(username string) (UserInfo, error) {
 	err := sql.DB.Where("username = ?", username).First(&user).Error
 	return user, err
 }
-func GetUserByTelephone(telephone string) (UserInfo, error) {
+func GetUserByTel(telephone string) (UserInfo, error) {
 	var user UserInfo
 	err := sql.DB.Where("telephone = ?", telephone).First(&user).Error
 	return user, err
@@ -45,10 +45,10 @@ func GetUserByEmail(email string) (UserInfo, error) {
 	return user, err
 }
 
-func GetUserList() []*UserInfo {
+func GetUserList() ([]*UserInfo, error) {
 	var users []*UserInfo
-	sql.DB.Find(&users)
-	return users
+	err := sql.DB.Find(&users).Error
+	return users, err
 }
 
 func UpdateUser(user UserInfo) error {

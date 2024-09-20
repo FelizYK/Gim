@@ -20,11 +20,11 @@ func MD5Encode(data string) string {
 }
 
 // encrypt password
-func MakePassword(password, salt string) string {
+func EncPassword(password, salt string) string {
 	return Md5Encode(password + salt)
 }
 
-// decrypt password
-func CheckPassword(password, salt, hash string) bool {
-	return MakePassword(password, salt) == hash
+// check password
+func CheckPassword(password, salt, cipher string) bool {
+	return EncPassword(password, salt) == cipher
 }

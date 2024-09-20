@@ -82,13 +82,58 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.deleteUserInfo"
+                            "$ref": "#/definitions/service.loginUserInfo"
                         }
                     }
                 ],
                 "responses": {
                     "204": {
                         "description": "Delete user success!"
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid username or password",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/getUser": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "GetUser by username and password",
+                "parameters": [
+                    {
+                        "description": "username, password",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.loginUserInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get user",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Invalid input",
@@ -120,6 +165,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Get user list",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -185,7 +236,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.deleteUserInfo": {
+        "service.loginUserInfo": {
             "type": "object",
             "properties": {
                 "password": {
