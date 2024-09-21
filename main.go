@@ -1,7 +1,6 @@
 package main
 
 import (
-	"Gim/internal/logic"
 	"Gim/internal/router"
 	"Gim/internal/server"
 )
@@ -11,7 +10,11 @@ func main() {
 	// testGorm()
 
 	server.InitMySQL()
-	logic.InitUserTable()
+	// logic.InitUserTable()
+	// logic.InitMessageTable()
+	// logic.InitRelationTable()
+	// logic.InitGroupTable()
+
 	server.InitRedis()
 
 	r := router.Router()
