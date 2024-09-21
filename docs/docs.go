@@ -30,6 +30,15 @@ const docTemplate = `{
                 }
             }
         },
+        "/message/sendMessage": {
+            "get": {
+                "tags": [
+                    "Message"
+                ],
+                "summary": "SendMessage",
+                "responses": {}
+            }
+        },
         "/user/createUser": {
             "post": {
                 "tags": [

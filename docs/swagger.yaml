@@ -38,6 +38,12 @@ paths:
             type: string
       tags:
       - Index
+  /message/sendMessage:
+    get:
+      responses: {}
+      summary: SendMessage
+      tags:
+      - Message
   /user/createUser:
     post:
       parameters:

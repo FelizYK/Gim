@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -12,8 +13,8 @@ import (
 )
 
 var (
-	DB *gorm.DB
-	RD *redis.Client
+	DB  *gorm.DB
+	RDB *redis.Client
 )
 
 func InitMySQL() {
@@ -30,22 +31,49 @@ func InitMySQL() {
 	dsn := "root:password@tcp(localhost:3306)/gim_db?charset=utf8mb4&parseTime=True&loc=Local"
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: mylogger})
 	if err != nil {
-		panic(err)
+		fmt.Println("MySQL connection failed: ", err)
+		return
 	}
 	fmt.Println("MySQL connected ...")
 }
 
 func InitRedis() {
-	RD = redis.NewClient(&redis.Options{
-		Addr:         "localhost:6379",
-		Password:     "",
-		DB:           0,
-		PoolSize:     10,
-		MinIdleConns: 5,
+	RDB = redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
 	})
-	_, err := RD.Ping(RD.Context()).Result()
+	_, err := RDB.Ping(RDB.Context()).Result()
 	if err != nil {
-		panic(err)
+		fmt.Println("Redis connection failed: ", err)
+		return
 	}
 	fmt.Println("Redis connected ...")
+}
+
+// Publish message to channel
+func Publish(ctx context.Context, channel string, message string) error {
+	err := RDB.Publish(ctx, channel, message).Err()
+	return err
+}
+
+// Subscribe to channel
+func Subscribe(ctx context.Context, channel string, messages chan<- string) {
+	pubSub := RDB.Subscribe(ctx, channel)
+	defer pubSub.Close()
+	if err := pubSub.Subscribe(ctx, channel); err != nil {
+		fmt.Println("Subscribe failed: ", err)
+		return
+	}
+
+	ch := pubSub.Channel()
+	for {
+		select {
+		case msg := <-ch:
+			messages <- msg.Payload
+		case <-ctx.Done():
+			fmt.Println("Subscription context cancelled or timed out")
+			return
+		}
+	}
 }
