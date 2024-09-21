@@ -34,6 +34,7 @@ func InitMySQL() {
 		fmt.Println("MySQL connection failed: ", err)
 		return
 	}
+
 	fmt.Println("MySQL connected ...")
 }
 
@@ -43,11 +44,11 @@ func InitRedis() {
 		Password: "",
 		DB:       0,
 	})
-	_, err := RDB.Ping(RDB.Context()).Result()
-	if err != nil {
+	if _, err := RDB.Ping(RDB.Context()).Result(); err != nil {
 		fmt.Println("Redis connection failed: ", err)
 		return
 	}
+
 	fmt.Println("Redis connected ...")
 }
 

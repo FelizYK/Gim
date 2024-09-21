@@ -8,3 +8,4 @@ go run main.go
 # message:
 #   https://www.wetools.com/websocket
 #   ws://localhost:8080/message/sendMessage
+#   ws://localhost:8080/message/sendUserMessage

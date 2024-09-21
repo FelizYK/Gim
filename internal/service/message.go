@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Gim/internal/logic"
 	"Gim/internal/server"
 	"fmt"
 	"net/http"
@@ -28,8 +29,7 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 	defer func() {
-		err := conn.Close()
-		if err != nil {
+		if err := conn.Close(); err != nil {
 			fmt.Println("Close connection failed: ", err)
 		}
 	}()
@@ -53,4 +53,8 @@ func SendMessage(c *gin.Context) {
 			return
 		}
 	}
+}
+
+func SendUserMessage(c *gin.Context) {
+	logic.Chat(c.Writer, c.Request)
 }

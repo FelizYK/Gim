@@ -24,6 +24,7 @@ func Router() *gin.Engine {
 	r.DELETE("/user/deleteUser", service.DeleteUser)
 
 	r.GET("/message/sendMessage", service.SendMessage)
+	r.GET("/message/sendUserMessage", service.SendUserMessage)
 
 	return r
 }
